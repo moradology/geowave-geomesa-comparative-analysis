@@ -18,9 +18,9 @@ import scala.collection.JavaConversions._
 
 import com.azavea.ingest.common._
 
-object Ingest {
+object GeoMesaIngest {
 
-  def registerSFTs(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]) =
+  def registerSFTs(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]): Unit =
     rdd.foreachPartition({ featureIter =>
       val ds = DataStoreFinder.getDataStore(cli.convertToJMap)
 
@@ -37,7 +37,7 @@ object Ingest {
       })
     })
 
-  def ingestRDD(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]) =
+  def ingestRDD(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]): Unit =
     rdd.foreachPartition({ featureIter =>
       val ds = DataStoreFinder.getDataStore(cli.convertToJMap)
 
@@ -70,7 +70,7 @@ object Ingest {
       ds.dispose
     })
 
-  def registerAndIngestRDD(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]) = {
+  def registerAndIngestRDD(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]): Unit = {
     registerSFTs(cli)(rdd)
     ingestRDD(cli)(rdd)
   }
