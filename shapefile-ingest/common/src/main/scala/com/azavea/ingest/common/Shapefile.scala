@@ -33,10 +33,7 @@ object Shapefile {
       }).toArray
   }
 
-  def shpUrls2shpRdd(urlArray: Array[String]): RDD[SimpleFeature] = {
-    val sparkConf: SparkConf = (new SparkConf).setAppName("GeoMesa shapefile ingest")
-    val sc: SparkContext = new SparkContext(sparkConf)
-
+  def shpUrls2shpRdd(urlArray: Array[String])(implicit sc: SparkContext): RDD[SimpleFeature] = {
     val urlRdd: RDD[String] = sc.parallelize(urlArray)
     urlRdd.mapPartitions({ urlIter =>
       val urls = urlIter.toList

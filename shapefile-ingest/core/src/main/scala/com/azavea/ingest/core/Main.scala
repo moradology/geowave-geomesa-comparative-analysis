@@ -1,5 +1,6 @@
 package com.azavea.ingest.core
 
+import org.apache.spark._
 import org.apache.spark.rdd.RDD
 import org.opengis.feature.simple.SimpleFeature
 
@@ -9,6 +10,11 @@ import com.azavea.ingest.common.Shapefile
 object Main {
   import com.azavea.ingest.common.CommandLine._
   def main(args: Array[String]): Unit = {
+
+    //Spark Context
+    val sparkConf = (new SparkConf).setAppName("GeoWave Synthetic Data Ingest")
+    implicit val sc = new SparkContext(sparkConf)
+
     val params: Params =
       parser.parse(args, Params()) match {
         case Some(params) => params
@@ -24,8 +30,10 @@ object Main {
 
     params.waveOrMesa match {
       case GeoMesa =>
-        GeoMesaIngest.registerAndIngestRDD(params)(featureRDD)
+        GeoMesaIngest.registerAndIngestRDD(params, featureRDD)
       case GeoWave => ???
+        // GeoWaveIngest.registerAndIngestRDD(params, featureRDD)
     }
+    sc.stop()
   }
 }

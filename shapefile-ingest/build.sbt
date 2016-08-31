@@ -42,6 +42,8 @@ lazy val commonSettings = Seq(
   )
 )
 
+mainClass in assembly := Some("com.azavea.ingest.core.Main")
+
 // When creating fat jar, remote some files with
 // bad signatures and resolve conflicts by taking the first
 // versions of shared packaged types.
@@ -58,11 +60,8 @@ assemblyMergeStrategy in assembly := {
 lazy val root = Project("shapefile-ingest", file("."))
   .settings(commonSettings: _*)
   .settings(name := "shapefile-ingest")
-  .aggregate(geomesa, common, core)
-
-lazy val core = Project("core", file("core"))
-  .settings(commonSettings: _*)
-  .dependsOn(geomesa, common)
+  .aggregate(common, geomesa, core)
+  .dependsOn(core)
 
 lazy val common = Project("common", file("common"))
   .settings(commonSettings: _*)
@@ -70,3 +69,8 @@ lazy val common = Project("common", file("common"))
 lazy val geomesa = Project("geomesa", file("geomesa"))
   .settings(commonSettings: _*)
   .dependsOn(common)
+
+lazy val core = Project("core", file("core"))
+  .settings(commonSettings: _*)
+  .dependsOn(geomesa, common)
+

@@ -20,9 +20,9 @@ import com.azavea.ingest.common._
 
 object GeoMesaIngest {
 
-  def registerSFTs(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]): Unit =
+  def registerSFTs(params: CommandLine.Params, rdd: RDD[SimpleFeature])(implicit sc: SparkContext): Unit =
     rdd.foreachPartition({ featureIter =>
-      val ds = DataStoreFinder.getDataStore(cli.convertToJMap)
+      val ds = DataStoreFinder.getDataStore(params.convertToJMap)
 
       if (ds == null) {
         println("Could not build AccumuloDataStore")
@@ -37,9 +37,9 @@ object GeoMesaIngest {
       })
     })
 
-  def ingestRDD(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]): Unit =
+  def ingestRDD(params: CommandLine.Params, rdd: RDD[SimpleFeature])(implicit sc: SparkContext): Unit =
     rdd.foreachPartition({ featureIter =>
-      val ds = DataStoreFinder.getDataStore(cli.convertToJMap)
+      val ds = DataStoreFinder.getDataStore(params.convertToJMap)
 
       if (ds == null) {
         println("Could not build AccumuloDataStore")
@@ -70,8 +70,8 @@ object GeoMesaIngest {
       ds.dispose
     })
 
-  def registerAndIngestRDD(cli: CommandLine.Params)(rdd: RDD[SimpleFeature]): Unit = {
-    registerSFTs(cli)(rdd)
-    ingestRDD(cli)(rdd)
+  def registerAndIngestRDD(params: CommandLine.Params, rdd: RDD[SimpleFeature])(implicit sc: SparkContext): Unit = {
+    registerSFTs(params, rdd)
+    ingestRDD(params, rdd)
   }
 }
