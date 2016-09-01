@@ -5,8 +5,8 @@ import org.apache.spark.rdd.RDD
 import org.geotools.data.DataStoreFinder
 import org.geotools.data.simple.SimpleFeatureStore
 import org.opengis.feature.simple._
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ListObjectsRequest
 
 import java.util.HashMap
@@ -16,7 +16,7 @@ import scala.collection.mutable
 object Shapefile {
 
   def getShpUrls(s3bucket: String, s3prefix: String): Array[String] = {
-    val cred = new ProfileCredentialsProvider()
+    val cred = new DefaultAWSCredentialsProviderChain()
     val client = new AmazonS3Client(cred)
 
     val objectRequest = (new ListObjectsRequest)

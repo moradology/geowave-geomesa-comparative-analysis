@@ -12,9 +12,13 @@ SBT_CMD=${SBT_CMD:-sbt}
 
 cd $PROJ_DIR
 (>&2 echo "Building assembly for $PROJ_NAME in $PROJ_DIR")
-ASSEMBLY_BLOB=$($SBT_CMD "project $PROJ_NAME" assembly)
+ASSEMBLY_BLOB=$(bash ./sbt "project $PROJ_NAME" assembly)
+if [[ $? != 0 ]]; then
+  (>&2 echo "Failed to execute assembly")
+  exit 1
+fi
 
-if [[ $ASSEMBLY_BLOB =~ ([a-zA-Z0-9\.\/-]+target\/scala[a-zA-Z0-9\.\/-]+jar) ]]; then
+if [[ $ASSEMBLY_BLOB =~ ([a-zA-Z0-9\.\/_-]+target\/scala[a-zA-Z0-9\.\/_-]+jar) ]]; then
     ASSEMBLY_JAR=${BASH_REMATCH[1]}
     (>&2 echo "Assembly: $ASSEMBLY_JAR")
 else

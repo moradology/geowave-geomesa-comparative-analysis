@@ -87,3 +87,26 @@ spark-submit --master yarn --deploy-mode cluster \
 ${ASSEMBLY_URI} \
 gis ${GEOMESA_ZOOKEEPER} root secret geomesa.test \
 point,100,uniform:-180:180,uniform:-90:90,fixed:0,100
+
+ingest-shapefiles: ASSEMBLY_URI=$(shell ./stage-assembly.sh ../shapefile-ingest core ${S3_URI}/jars)
+ingest-shapefiles:
+	./add-steps.sh ${GEOMESA_CLUSTER_ID} "Ingest Shapefiles" \
+spark-submit --master yarn --deploy-mode cluster \
+--driver-memory ${DRIVER_MEMORY} \
+--driver-cores ${DRIVER_CORES} \
+--executor-memory ${EXECUTOR_MEMORY} \
+--executor-cores ${EXECUTOR_CORES} \
+--conf spark.dynamicAllocation.enabled=true \
+--conf spark.yarn.executor.memoryOverhead=${YARN_OVERHEAD} \
+--conf spark.yarn.driver.memoryOverhead=${YARN_OVERHEAD} \
+--class com.azavea.ingest.core.Main \
+${ASSEMBLY_URI} geomesa \
+-f shapefile \
+-i geomesa \
+-z ${GEOMESA_ZOOKEEPER} \
+-u root \
+-p secret \
+-t geomesa.shapefile \
+-b geotrellis-sample-datasets \
+-d generated-tracks/
+
