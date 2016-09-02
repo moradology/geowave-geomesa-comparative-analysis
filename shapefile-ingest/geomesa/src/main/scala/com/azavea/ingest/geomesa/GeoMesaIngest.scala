@@ -29,9 +29,12 @@ object GeoMesaIngest {
         java.lang.System.exit(-1)
       }
 
-      featureIter.toStream.map({feature =>
+      val uniqueSFTs = featureIter.toStream.map({feature =>
+        println(s"Feature encountered: ${feature.getName.toString}")
         feature.getFeatureType
-      }).distinct.foreach({ sft =>
+      }).distinct
+
+      uniqueSFTs.foreach({ sft =>
         ds.createSchema(sft)
         ds.dispose
       })

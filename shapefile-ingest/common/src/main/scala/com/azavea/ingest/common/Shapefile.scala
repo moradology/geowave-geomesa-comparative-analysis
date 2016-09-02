@@ -34,7 +34,7 @@ object Shapefile {
   }
 
   def shpUrls2shpRdd(urlArray: Array[String])(implicit sc: SparkContext): RDD[SimpleFeature] = {
-    val urlRdd: RDD[String] = sc.parallelize(urlArray)
+    val urlRdd: RDD[String] = sc.parallelize(urlArray, 100)
     urlRdd.mapPartitions({ urlIter =>
       val urls = urlIter.toList
       urls.map({ url =>

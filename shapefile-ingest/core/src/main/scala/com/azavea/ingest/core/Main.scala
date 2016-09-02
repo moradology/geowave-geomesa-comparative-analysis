@@ -12,7 +12,7 @@ object Main {
   def main(args: Array[String]): Unit = {
 
     //Spark Context
-    val sparkConf = (new SparkConf).setAppName("GeoWave Synthetic Data Ingest")
+    val sparkConf = (new SparkConf).setAppName("File Ingest")
     implicit val sc = new SparkContext(sparkConf)
 
     val params: Params =

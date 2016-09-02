@@ -102,7 +102,7 @@ spark-submit --master yarn --deploy-mode cluster \
 --class com.azavea.ingest.core.Main \
 ${ASSEMBLY_URI} geomesa \
 -f shapefile \
--i geomesa \
+-i gis \
 -z ${GEOMESA_ZOOKEEPER} \
 -u root \
 -p secret \
