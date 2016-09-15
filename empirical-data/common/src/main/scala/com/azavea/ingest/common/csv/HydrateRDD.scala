@@ -54,7 +54,7 @@ object HydrateRDD extends HydrateRDDUtils {
         iter.next()
       }
       iter
-    }).repartition(30000)
+    }).repartition(5000)
   }
 
   def csvLinesToSfRdd(schema: CSVSchemaParser.Expr,
@@ -66,7 +66,7 @@ object HydrateRDD extends HydrateRDDUtils {
       lineIter.map({ line =>
         val row: Array[String] = line.split(delim)
 
-        schema.makeSimpleFeature(sftName, row)
+        schema.makeSimpleFeature(sftName, row, java.util.UUID.randomUUID().toString())
       })
     })
 
@@ -100,3 +100,4 @@ object HydrateRDD extends HydrateRDDUtils {
   }
 
 }
+

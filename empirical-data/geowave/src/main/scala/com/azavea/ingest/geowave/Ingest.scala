@@ -90,25 +90,42 @@ object Ingest {
 
   def ingestRDD(params: Params)(rdd: RDD[SimpleFeature])(implicit sc: SparkContext) =
     rdd.foreachPartition({ featureIter =>
+      var count = 1
+      def prnt = {
+        println(s"the count is... $count")
+        count += 1
+      }
+      prnt
       val features = featureIter.buffered
+      prnt
       val ds = getGeowaveDataStore(params)
+      prnt
 
       val adapter = new FeatureDataAdapter(features.head.getType())
+      prnt
 
       val indexes =
         if (params.temporal) {
           // Create both a spatialtemporal and a spatail-only index
           val b = new SpatialTemporalDimensionalityTypeProvider.SpatialTemporalIndexBuilder
           b.setPointOnly(params.pointOnly)
+          println("setting up spatiotemporal indexbuilder")
           Seq(b.createIndex, (new SpatialDimensionalityTypeProvider.SpatialIndexBuilder).createIndex)
         } else {
+          println("setting up spatial indexbuilder")
           Seq((new SpatialDimensionalityTypeProvider.SpatialIndexBuilder).createIndex)
         }
-      val indexWriter = ds.createWriter(adapter, indexes:_*).asInstanceOf[IndexWriter[SimpleFeature]]
+      prnt
+      println("GETTING READY")
+      val indexWriters = ds.createWriter(adapter, indexes).asInstanceOf[IndexWriter[SimpleFeature]]
+      println("DID IT")
+      prnt
       try {
         features.foreach({ feature => indexWriter.write(feature) })
+        println("done")
       } finally {
         indexWriter.close()
+        println("closed")
       }
     })
 }

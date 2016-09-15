@@ -84,7 +84,6 @@ import scala.collection.JavaConversions._
            toWrite.setAttributes(feature.getAttributes)
            toWrite.getIdentifier.asInstanceOf[FeatureIdImpl].setID(feature.getID)
            toWrite.getUserData.putAll(feature.getUserData)
-           toWrite.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.TRUE)
 
            try {
              fw.write()
