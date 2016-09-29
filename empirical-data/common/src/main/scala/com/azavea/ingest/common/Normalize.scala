@@ -22,7 +22,7 @@ object NormalizeRDD {
       val headFeature = bufferedFeatures.head
 
       val builder = new SimpleFeatureTypeBuilder
-      builder.setName(typeName)
+      builder.setName(headFeature.getType.getName)
       builder.addAll(headFeature.getType.getAttributeDescriptors)
       headFeature.getUserData.map({ case (key, value) => builder.userData(key, value) })
       val sft = builder.buildFeatureType()

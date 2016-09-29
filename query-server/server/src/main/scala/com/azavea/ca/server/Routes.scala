@@ -81,5 +81,6 @@ object Routes {
     GDELTQueries.routes ~
     TranslatedViennaQueries.routes ~
     TracksQueries.routes ~
-    randomExtentQueryRoutes
+    randomExtentQueryRoutes ~
+    SecondaryAttributeIndices.routes
 }

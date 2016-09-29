@@ -7,7 +7,7 @@ export S3_URI := s3://geotrellis-test/ca/${STACK_NAME}
 export SUBNET_ID := subnet-c5fefdb1
 
 export MASTER_INSTANCE := m3.xlarge
-export MASTER_PRICE := 0.5
+export MASTER_PRICE := 0.9
 
 # export WORKER_INSTANCE := m3.xlarge
 # export CPUS_PER_WORKER := 4
@@ -15,8 +15,8 @@ export MASTER_PRICE := 0.5
 export WORKER_INSTANCE := m3.2xlarge
 export CPUS_PER_WORKER := 8
 
-export WORKER_PRICE := 0.5
-export WORKER_COUNT := 5
+export WORKER_PRICE := 0.9
+export WORKER_COUNT := 10
 
 export DRIVER_MEMORY := 4200M
 export DRIVER_CORES := 2
@@ -25,7 +25,7 @@ export EXECUTOR_CORES := 2
 export YARN_OVERHEAD := 700
 
 # Docker image of benchmarking service
-export SERVICE_TAG := rob40
+export SERVICE_TAG := nathan6
 export SERVICE_IMG := quay.io/geotrellis/comparative-analysis-query-server:${SERVICE_TAG}
 
 SPARK_PARAMS := --driver-memory ${DRIVER_MEMORY} \
@@ -166,6 +166,8 @@ avro -i gis -z ${GEOWAVE_ZOOKEEPER} -u root \
 --featurename generated-tracks --temporal --inputPartitionSize 1 \
 geotrellis-sample-datasets generated-tracks/
 
+ingest-generated-tracks: ingest-generated-tracks-gm ingest-generated-tracks-gw
+
 ingest-vienna-gm: export ASSEMBLY_URI=$(shell ./stage-assembly.sh ../empirical-data geomesa ${S3_URI}/jars)
 ingest-vienna-gm:
 	@if [ -z "$${ASSEMBLY_URI}" ]; then echo "Assembly failed" && exit 1; fi
@@ -243,6 +245,20 @@ ingest-gdelt-gw:
 spark-submit ${SPARK_OPTIONS} --class com.azavea.ingest.geowave.GdeltIngest ${ASSEMBLY_URI} ${GEOWAVE_ZOOKEEPER}
 
 ingest-gdelt: ingest-gdelt-gw ingest-gdelt-gm
+
+ingest-gdelt-gm-idx: ASSEMBLY_URI=$(shell ./stage-assembly.sh ../empirical-data geomesa ${S3_URI}/jars)
+ingest-gdelt-gm-idx:
+	@if [ -z "${ASSEMBLY_URI}" ]; then echo "Assembly failed" && exit 1; fi
+	./add-steps.sh ${GEOMESA_CLUSTER_ID} "Ingest GDELT GeoMesa" \
+spark-submit ${SPARK_OPTIONS} --class com.azavea.ingest.geomesa.IndexedGdeltIngest ${ASSEMBLY_URI} ${GEOMESA_ZOOKEEPER}
+
+ingest-gdelt-gw-idx: ASSEMBLY_URI=$(shell ./stage-assembly.sh ../empirical-data geowave ${S3_URI}/jars)
+ingest-gdelt-gw-idx:
+	@if [ -z "${ASSEMBLY_URI}" ]; then echo "Assembly failed" && exit 1; fi
+	./add-steps.sh ${GEOWAVE_CLUSTER_ID} "Ingest GDELT GeoWave" \
+spark-submit ${SPARK_OPTIONS} --class com.azavea.ingest.geowave.IndexedGdeltIngest ${ASSEMBLY_URI} ${GEOWAVE_ZOOKEEPER}
+
+ingest-gdelt-idx: ingest-gdelt-gw-idx ingest-gdelt-gm-idx
 
 ../query-server/explore/target/scala-2.11/explore-assembly-0.0.1.jar: $(call rwildcard, $(call rwildcard, server, *.scala) build.sbt, *.scala) ../query-server/explore/build.sbt
 	cd ../query-server/ && ./sbt "project explore" assembly

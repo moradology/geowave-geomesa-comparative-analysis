@@ -16,6 +16,7 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.geotools.data.simple.SimpleFeatureStore
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd._
+import org.geotools.referencing.CRS
 
 import java.util.HashMap
 import scala.collection.JavaConversions._
@@ -60,12 +61,13 @@ object Main {
         val urls = Util.listKeys(params.s3bucket, params.s3prefix, ".shp")
         val shpUrlRdd: RDD[SimpleFeature] = shpUrlsToRdd(urls, params.inputPartitionSize)
         val shpSimpleFeatureRdd: RDD[SimpleFeature] = NormalizeRDD.normalizeFeatureName(shpUrlRdd, params.featureName)
+        val reprojected = shpSimpleFeatureRdd.map(Reproject(_, CRS.decode("EPSG:4326")))
 
         if (params.translationPoints.nonEmpty && params.translationOrigin.isDefined)
           Ingest.ingestRDD(params)(
-            TranslateRDD(shpSimpleFeatureRdd, params.translationOrigin.get, params.translationPoints))
+            TranslateRDD(reprojected, params.translationOrigin.get, params.translationPoints))
         else
-          Ingest.ingestRDD(params)(shpSimpleFeatureRdd)
+          Ingest.ingestRDD(params)(reprojected)
       }
       case Ingest.CSV => {
         val urls = Util.listKeys(params.s3bucket, params.s3prefix, params.csvExtension)

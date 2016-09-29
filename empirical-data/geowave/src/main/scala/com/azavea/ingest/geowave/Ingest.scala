@@ -142,10 +142,10 @@ object Ingest {
     val ops = getOperations(params)
     for(index <- indexes(params)) {
       ops.createTable(
-	StringUtils.stringFromBinary(index.getId.getBytes),
-	true,
+        StringUtils.stringFromBinary(index.getId.getBytes),
         true,
-	index.getIndexStrategy.getNaturalSplits
+        true,
+        index.getIndexStrategy.getNaturalSplits
       )
     }
 

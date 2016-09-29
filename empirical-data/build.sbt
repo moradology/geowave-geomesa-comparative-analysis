@@ -41,6 +41,10 @@ lazy val commonSettings = Seq(
   )
 )
 
+assemblyShadeRules in assembly := Seq(
+  ShadeRule.rename("com.clearspring.analytics.**" -> "org.locationtech.geomesa.shaded.com.clearspring.analytics.@1").inAll
+)
+
 // When creating fat jar, remote some files with
 // bad signatures and resolve conflicts by taking the first
 // versions of shared packaged types.

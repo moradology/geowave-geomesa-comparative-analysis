@@ -5,7 +5,7 @@ import org.apache.spark.rdd._
 import org.opengis.feature.simple._
 import org.geotools.feature.simple._
 import org.geotools.data.{DataStoreFinder, DataUtilities, FeatureWriter, Transaction}
-import org.geotools.referencing.CRS;
+import org.geotools.referencing.CRS
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd._
 
